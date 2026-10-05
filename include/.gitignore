@@ -1,0 +1,13 @@
+# Compiled binaries
+router
+test_client
+
+# Object files
+*.o
+src/*.o
+test/*.o
+
+# OS and Editor metadata
+.DS_Store
+*.swp
+.vscode/
