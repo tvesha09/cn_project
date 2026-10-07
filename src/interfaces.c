@@ -49,12 +49,26 @@ void interfaces_init(void) {
     }
 }
 
-void interfaces_start_listeners(void (*handler)(int, const char*, void*, int)) {
+void interfaces_start_listeners(void (*handler)(int, const char*, void*, int))
+{
     g_handler = handler;
-    pthread_t tid;
+
+    pthread_t threads[NUM_INTERFACES];
+
     for (int i = 0; i < NUM_INTERFACES; i++) {
-        pthread_create(&tid, NULL, listener_thread, &g_interfaces[i]);
-        pthread_detach(tid);
+        if (pthread_create(
+                &threads[i],
+                NULL,
+                listener_thread,
+                &g_interfaces[i]) != 0) {
+            perror("pthread_create");
+            exit(1);
+        }
+    }
+
+    /* Keep the router running */
+    for (int i = 0; i < NUM_INTERFACES; i++) {
+        pthread_join(threads[i], NULL);
     }
 }
 
