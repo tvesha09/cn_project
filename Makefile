@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Iinclude -pthread
 
-SRC = src/lpm.c src/arp.c src/interfaces.c src/router_core.c src/main.c
+SRC = src/lpm.c src/arp.c src/interfaces.c src/router_core.c src/icmp.c src/main.c
 OBJ = $(SRC:.c=.o)
 
 all: router test_client
@@ -9,7 +9,7 @@ all: router test_client
 router: $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
-test_client: test/test_client.c
+test_client: test/test_client.c src/icmp.o
 	$(CC) $(CFLAGS) -o $@ $^
 
 clean:
