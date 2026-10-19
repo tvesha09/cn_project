@@ -1,0 +1,9 @@
+# Compiled programs
+/router
+/test_client
+
+# Compiled object files
+*.o
+
+# macOS files
+.DS_Store
