@@ -18,12 +18,12 @@
 
 ### Wireshark Evidence
 - Capture interface: lo0 (Loopback)
-- Display filter: udp.port == 9001
+- Display filter used: udp.port == 8001 || udp.port == 8002 || udp.port == 8003 || udp.port == 9001 || udp.port == 9002
 - Router interface ports: UDP 8001, 8002 and 8003
 - Test client response port: UDP 9001
 - Forwarding destination port: UDP 9002
 
-Capture file: cn_project_icmp_tests.pcapng
+Capture file: captures/review1_forwarding_demo.pcapng
 
 ### Implementation Note
 The current prototype uses custom simulated packets transported over UDP.
