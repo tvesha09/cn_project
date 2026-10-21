@@ -19,3 +19,5 @@ clean:
 	rm -f src/*.o test/*.o router test_client
 
 .PHONY: all clean
+test_arp: test/test_arp.c src/arp.c
+	gcc -Wall -Wextra -Iinclude -o test_arp test/test_arp.c src/arp.c
