@@ -58,6 +58,10 @@ int main(void) {
     printf("\nTEST 3: ARP cache miss\n");
     send_test_packet(sock_fd, 64, "192.168.2.99");
     sleep(1);
+    
+    printf("\nTEST 3: ARP cache miss\n");
+    send_test_packet(sock_fd, 64, "192.168.2.99");
+    sleep(1);
 
     close(sock_fd);
     return 0;
