@@ -90,6 +90,12 @@ static int receive_icmp_response(
         return -1;
     }
 
+    if (icmp_checksum(response.payload, response.payload_len) != 0) {
+        printf("[FAIL] Invalid simulated ICMP checksum\n");
+        return -1;
+    }
+    printf("[PASS] Simulated ICMP checksum valid\n");
+
     icmp_header_t header;
     memcpy(&header, response.payload, sizeof(header));
 

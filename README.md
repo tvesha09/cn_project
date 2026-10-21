@@ -37,6 +37,7 @@ or a Mininet topology.
 - Normal forwarding was observed at the UDP receiver on port 9002.
 - ICMP Time Exceeded (type 11, code 0) was received for TTL expiry.
 - ICMP Echo Reply (type 0, code 0) was received.
+- Simulated ICMP checksum validation passed for Time Exceeded, Echo Reply, and Destination Unreachable responses.
 - ICMP Destination Unreachable (type 3, code 1) was received.
 - Automated test client completed all four test cases.
 
