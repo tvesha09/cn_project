@@ -63,10 +63,21 @@ void packet_handler(int sock_fd, const char *iface, void *buf, int len)
     uint8_t next_mac[6];
     int dest_port;
 
-    if (!arp_lookup(target_ip, next_mac, &dest_port)) {
-        printf("[DROP] ARP resolution failed\n");
-        return;
+    
+if (!arp_lookup(target_ip, next_mac, &dest_port)) {
+    char target_ip_str[INET_ADDRSTRLEN];
+
+    if (inet_ntop(AF_INET, &target_ip, target_ip_str,
+                  sizeof(target_ip_str)) == NULL) {
+        strcpy(target_ip_str, "unknown");
     }
+
+    printf("[ARP] MAC resolution failed for %s\n",
+           target_ip_str);
+    printf("[DROP] Packet dropped: destination MAC unavailable\n");
+    return;
+}
+
 
     printf("[ARP] MAC resolved, destination UDP port=%d\n",
            dest_port);
