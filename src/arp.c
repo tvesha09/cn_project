@@ -80,9 +80,7 @@ int arp_lookup(uint32_t ip, uint8_t *out_mac, int *out_port) {
 
     time_t now = time(NULL);
     
-    printf("[ARP DEBUG] Looking up IP: %u\n", ip);
     for (int i = 0; i < arp_count; i++) {
-        printf("[ARP DEBUG] Cache entry %d IP: %u\n", i, arp_cache[i].ip);
         if (arp_cache[i].ip == ip) {
             if (now - (time_t)arp_cache[i].last_updated >=
                 ARP_CACHE_TIMEOUT) {
