@@ -30,21 +30,4 @@ The current prototype uses custom simulated packets transported over UDP.
 The ICMP message types are encoded within the custom packet payload.
 This does not yet demonstrate native ICMP over IPv4 through TUN/TAP
 or a Mininet topology.
-### Verification Status
 
-**Verified**
-- Project compiles successfully using `make clean && make`.
-- Normal forwarding was observed at the UDP receiver on port 9002.
-- ICMP Time Exceeded (type 11, code 0) was received for TTL expiry.
-- ICMP Echo Reply (type 0, code 0) was received.
-- Simulated ICMP checksum validation passed for Time Exceeded, Echo Reply, and Destination Unreachable responses.
-- ICMP Destination Unreachable (type 3, code 1) was received.
-- Automated test client completed all four test cases.
-
-**Pending**
-- Native IPv4 forwarding through a TUN/TAP interface.
-- Mininet-based network testing.
-- End-to-end native `ping` and `traceroute`.
-- Verification of IPv4 header checksum updates when TTL is decremented.
-
-**Scope note:** The verified tests use custom simulated packets transported over UDP. They do not establish that native IPv4 routing works end to end.
