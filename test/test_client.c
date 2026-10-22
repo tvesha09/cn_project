@@ -5,7 +5,7 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <unistd.h>
-
+#include <arpa/inet.h>
 #include "packet.h"
 #include "icmp.h"
 
@@ -19,7 +19,6 @@ static int send_test_packet(
 {
     router_packet_t pkt;
     memset(&pkt, 0, sizeof(pkt));
-
     pkt.magic = PACKET_MAGIC;
     pkt.ttl = ttl;
 
@@ -222,18 +221,19 @@ int main(void)
         return 1;
     }
 
-    printf("=== Router Test Client ===\n");
+int main(void) {
+    printf("=== Dynamic ARP Test Simulation ===\n\n");
 
-    printf("\nTEST 1: Normal forwarding\n");
-
-    if (send_test_packet(sock_fd, 64, "192.168.2.20") != 0) {
-        close(sock_fd);
-        return 1;
-    }
+    // Phase 1: Send packet without ARP entry (Trigger Cache Miss & ARP Request)
+    printf("[*] Step 1: Sending data packet to 192.168.2.20 (Cache Miss Expected)...\n");
+    send_data_packet("192.168.1.10", "192.168.2.20");
 
     sleep(1);
 
-    printf("\nTEST 2: TTL expiry and ICMP response\n");
+    // Phase 2: Host B sends ARP Reply back to router eth1 (Port 8002)
+    printf("\n[*] Step 2: Simulating Host B answering ARP Request...\n");
+    uint8_t host_b_mac[6] = {0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0x02};
+    send_arp_reply("192.168.2.20", host_b_mac, 8002);
 
     if (send_test_packet(sock_fd, 1, "192.168.2.20") != 0 ||
         receive_icmp_response(sock_fd, ICMP_TIME_EXCEEDED) != 0) {
@@ -250,6 +250,9 @@ int main(void)
     }
     printf("\nTEST 4: Destination Unreachable\n");
 
+    // Phase 3: Send another data packet (Now it should be a Cache HIT and forward immediately)
+    printf("\n[*] Step 3: Sending second packet to 192.168.2.20 (Cache Hit Expected)...\n");
+    send_data_packet("192.168.1.10", "192.168.2.20");
 if (send_test_packet(sock_fd, 64, "172.16.5.99") != 0 ||
     receive_icmp_response(sock_fd, ICMP_DEST_UNREACHABLE) != 0) {
     close(sock_fd);
