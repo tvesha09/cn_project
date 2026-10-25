@@ -1,7 +1,13 @@
 # BACSE203 — Computer Networks: Project Report
 ## Topic 2: Userspace IP Router / Software Switch
 
----
+### Implemented Features
+- RFC 1071 packet-header and ICMP checksum calculation and validation.
+- Simulated ICMP Echo Request and Echo Reply.
+- ICMP Time Exceeded response when TTL is 1.
+- ICMP Destination Unreachable response when ARP resolution fails or times out.
+- Dynamic ARP request broadcasting, reply caching, cache aging, and pending-packet queueing.
+- UDP-based test client for injecting packets and checking forwarded and ICMP responses.
 
 ### Basic Details
 

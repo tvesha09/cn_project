@@ -35,6 +35,17 @@ void interfaces_init(void) {
         int fd = socket(AF_INET, SOCK_DGRAM, 0);
         if (fd < 0) { perror("socket"); exit(1); }
 
+        int broadcast = 1;
+
+        if (setsockopt(
+                fd,
+                SOL_SOCKET,
+                SO_BROADCAST,
+                &broadcast,
+                sizeof(broadcast)) < 0) {
+            perror("setsockopt SO_BROADCAST");
+        }
+
         struct sockaddr_in addr;
         memset(&addr, 0, sizeof(addr));
         addr.sin_family = AF_INET;

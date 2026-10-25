@@ -3,8 +3,7 @@
 #include "interfaces.h"
 #include "lpm.h"
 #include "arp.h"
-
-void packet_handler(int sock_fd, const char *iface, void *buf, int len);
+#include "router_core.h"
 
 int main(void)
 {
@@ -13,6 +12,7 @@ int main(void)
     lpm_init();
     arp_init();
     interfaces_init();
+    router_start_timer();
 
     printf("[MAIN] Router initialized\n");
 

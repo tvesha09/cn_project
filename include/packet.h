@@ -26,4 +26,8 @@ typedef struct {
 } router_packet_t;
 #pragma pack(pop)
 
-#endif // PACKET_H
+uint16_t packet_checksum_compute(const router_packet_t *pkt);
+void packet_checksum_update(router_packet_t *pkt);
+int packet_checksum_verify(const router_packet_t *pkt);
+
+#endif// PACKET_H

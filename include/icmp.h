@@ -1,4 +1,3 @@
-
 #ifndef ICMP_H
 #define ICMP_H
 
@@ -13,8 +12,9 @@
 #define ICMP_TIME_EXCEEDED     11
 
 /* Common ICMP error codes */
-#define ICMP_CODE_NET_UNREACHABLE  0
-#define ICMP_CODE_TTL_EXPIRED     0
+#define ICMP_CODE_NET_UNREACHABLE   0
+#define ICMP_CODE_HOST_UNREACHABLE  1
+#define ICMP_CODE_TTL_EXPIRED       0
 
 /* Standard 8-byte ICMP header */
 typedef struct {

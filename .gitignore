@@ -1,6 +1,7 @@
 # Compiled programs
 /router
 /test_client
+/benchmark_lpm
 
 # Compiled object files
 *.o
