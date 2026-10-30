@@ -2,6 +2,7 @@
 /router
 /test_client
 /benchmark_lpm
+/test_arp
 
 # Compiled object files
 *.o

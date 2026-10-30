@@ -46,6 +46,28 @@ void interfaces_init(void) {
             perror("setsockopt SO_BROADCAST");
         }
 
+        int reuse = 1;
+
+        if (setsockopt(
+                fd,
+                SOL_SOCKET,
+                SO_REUSEADDR,
+                &reuse,
+                sizeof(reuse)) < 0) {
+            perror("setsockopt SO_REUSEADDR");
+        }
+
+#ifdef SO_REUSEPORT
+        if (setsockopt(
+                fd,
+                SOL_SOCKET,
+                SO_REUSEPORT,
+                &reuse,
+                sizeof(reuse)) < 0) {
+            perror("setsockopt SO_REUSEPORT");
+        }
+#endif
+
         struct sockaddr_in addr;
         memset(&addr, 0, sizeof(addr));
         addr.sin_family = AF_INET;

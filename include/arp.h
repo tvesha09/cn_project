@@ -43,6 +43,7 @@ void arp_expire(void);
 // Cache Operations
 void arp_cache_insert(uint32_t ip, const uint8_t *mac, int host_port);
 void arp_add_entry(uint32_t ip, const uint8_t *mac, int host_port);
+void arp_add(const char *ip_str, const uint8_t *mac, int port);
 int  arp_cache_lookup(uint32_t ip, uint8_t *out_mac, int *out_port);
 int  arp_lookup(uint32_t ip, uint8_t *out_mac, int *out_port);
 

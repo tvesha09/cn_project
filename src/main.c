@@ -7,6 +7,8 @@
 
 int main(void)
 {
+    setvbuf(stdout, NULL, _IONBF, 0);
+
     printf("=== Userspace IP Router ===\n");
 
     lpm_init();

@@ -98,6 +98,24 @@ void arp_add_entry(uint32_t ip, const uint8_t *mac, int host_port) {
     arp_cache_insert(ip, mac, host_port);
 }
 
+void arp_add(const char *ip_str, const uint8_t *mac, int port) {
+    if (ip_str == NULL || mac == NULL) {
+        return;
+    }
+
+    struct in_addr addr;
+
+    if (inet_pton(AF_INET, ip_str, &addr) != 1) {
+        addr.s_addr = inet_addr(ip_str);
+        if (addr.s_addr == INADDR_NONE) {
+            fprintf(stderr, "[ARP] Invalid IP address: %s\n", ip_str);
+            return;
+        }
+    }
+
+    arp_cache_insert(addr.s_addr, mac, port);
+}
+
 int arp_cache_lookup(uint32_t ip, uint8_t *out_mac, int *out_port) {
     pthread_mutex_lock(&arp_lock);
     arp_expire_locked(time(NULL));

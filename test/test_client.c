@@ -12,6 +12,7 @@
 #include "arp.h"
 
 #define ROUTER_PORT 8001
+#define ROUTER_ETH1_PORT 8002
 #define CLIENT_PORT 9001
 #define FORWARD_PORT 9002
 #define DYNAMIC_HOST_PORT 9010
@@ -38,6 +39,15 @@ static void *arp_responder_thread(void *arg)
         SO_REUSEADDR,
         &reuse,
         sizeof(reuse));
+
+#ifdef SO_REUSEPORT
+    setsockopt(
+        sock_fd,
+        SOL_SOCKET,
+        SO_REUSEPORT,
+        &reuse,
+        sizeof(reuse));
+#endif
 
     struct sockaddr_in arp_addr;
     memset(&arp_addr, 0, sizeof(arp_addr));
@@ -133,6 +143,78 @@ static void *arp_responder_thread(void *arg)
 
     close(sock_fd);
     return NULL;
+}
+
+static int announce_arp_entry(
+    int router_port,
+    const char *ip_str,
+    const uint8_t *mac,
+    int host_port,
+    const char *router_ip)
+{
+    int sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
+
+    if (sock_fd < 0) {
+        perror("[FAIL] ARP announce socket");
+        return -1;
+    }
+
+    router_packet_t frame;
+    memset(&frame, 0, sizeof(frame));
+
+    frame.magic = PACKET_MAGIC;
+    frame.ttl = 1;
+    memcpy(frame.src_mac, mac, 6);
+
+    arp_message_t reply;
+    memset(&reply, 0, sizeof(reply));
+
+    reply.magic = ARP_MAGIC;
+    reply.opcode = ARP_OP_REPLY;
+    memcpy(reply.sender_mac, mac, 6);
+
+    if (inet_pton(AF_INET, ip_str, &reply.sender_ip) != 1 ||
+        inet_pton(AF_INET, router_ip, &reply.target_ip) != 1) {
+        fprintf(stderr, "[FAIL] Invalid ARP announcement IP\n");
+        close(sock_fd);
+        return -1;
+    }
+
+    reply.sender_port = host_port;
+    frame.src_ip = reply.sender_ip;
+    frame.dst_ip = reply.target_ip;
+    frame.payload_len = (uint16_t)sizeof(reply);
+    memcpy(frame.payload, &reply, sizeof(reply));
+    packet_checksum_update(&frame);
+
+    struct sockaddr_in router_addr;
+    memset(&router_addr, 0, sizeof(router_addr));
+
+    router_addr.sin_family = AF_INET;
+    router_addr.sin_port = htons(router_port);
+    router_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+    ssize_t sent = sendto(
+        sock_fd,
+        &frame,
+        sizeof(frame),
+        0,
+        (struct sockaddr *)&router_addr,
+        sizeof(router_addr));
+
+    close(sock_fd);
+
+    if (sent != (ssize_t)sizeof(frame)) {
+        perror("[FAIL] ARP announcement sendto");
+        return -1;
+    }
+
+    printf("[TEST] ARP entry announced: %s -> UDP %d via router port %d\n",
+           ip_str,
+           host_port,
+           router_port);
+
+    return 0;
 }
 
 static int open_data_socket(int port)
@@ -393,6 +475,8 @@ static int send_echo_request(int sock_fd)
 
 int main(void)
 {
+    setvbuf(stdout, NULL, _IONBF, 0);
+
     int sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
 
     if (sock_fd < 0) {
@@ -443,6 +527,29 @@ int main(void)
 
     pthread_detach(arp_thread);
     usleep(200000);
+
+    const uint8_t client_mac[6] =
+        {0xAA, 0xAA, 0xAA, 0xAA, 0xAA, 0x10};
+    const uint8_t forward_mac[6] =
+        {0xBB, 0xBB, 0xBB, 0xBB, 0xBB, 0x20};
+
+    if (announce_arp_entry(
+            ROUTER_PORT,
+            "192.168.1.10",
+            client_mac,
+            CLIENT_PORT,
+            "192.168.1.1") != 0 ||
+        announce_arp_entry(
+            ROUTER_ETH1_PORT,
+            "192.168.2.20",
+            forward_mac,
+            FORWARD_PORT,
+            "192.168.2.1") != 0) {
+        close(sock_fd);
+        return 1;
+    }
+
+    usleep(100000);
 
     printf("=== Router Test Client ===\n");
 
